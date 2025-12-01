@@ -15,6 +15,36 @@ struct ObjectAndBlobId {
     expected_path: String,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+struct BlobIdExpectedPath {
+    blob_id: String,
+    expected_path: String,
+}
+
+// PartialEq and Eq compare only blob_id for deduplication
+impl PartialEq for ObjectAndBlobId {
+    fn eq(&self, other: &Self) -> bool {
+        self.blob_id == other.blob_id
+    }
+}
+
+impl Eq for ObjectAndBlobId {}
+
+// Ord and PartialOrd sort by blob_id first, then object_id
+impl PartialOrd for ObjectAndBlobId {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for ObjectAndBlobId {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match self.blob_id.cmp(&other.blob_id) {
+            std::cmp::Ordering::Equal => self.object_id.cmp(&other.object_id),
+            other => other,
+        }
+    }
+}
 
 fn to_expected_path(blob_id: &str) -> String {
     return format!("{}/{}/{}.f", &blob_id[0..3], &blob_id[3..6], &blob_id[6..]);
@@ -100,11 +130,18 @@ pub fn extract_from_log(
             warn!("{}", termimad::inline(&completed))
         }
     }
-    // object_and_blob_ids.sort();
-    // object_and_blob_ids.dedup();
+    object_and_blob_ids.sort();
+    object_and_blob_ids.dedup();
     info!("{} unique blobs identified", object_and_blob_ids.len());
+    let blobs_and_expected_pats: Vec<BlobIdExpectedPath> = object_and_blob_ids
+        .iter()
+        .map(|o| BlobIdExpectedPath {
+            blob_id: o.blob_id.clone(),
+            expected_path: o.expected_path.clone(),
+        })
+        .collect();
 
     info!("Writing '{:#?}'", out_file_path);
-    serde_json::to_writer_pretty(&File::create(out_file_path)?, &object_and_blob_ids)?;
+    serde_json::to_writer_pretty(&File::create(out_file_path)?, &blobs_and_expected_pats)?;
     Ok(())
 }
