@@ -8,15 +8,11 @@ use std::{
     path::PathBuf,
 };
 
+use crate::BlobIdExpectedPath;
+
 #[derive(Debug, Deserialize, Serialize)]
 struct ObjectAndBlobId {
     object_id: String,
-    blob_id: String,
-    expected_path: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct BlobIdExpectedPath {
     blob_id: String,
     expected_path: String,
 }
