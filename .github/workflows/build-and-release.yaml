@@ -22,7 +22,7 @@ jobs:
     - name: Archive
       uses: vimtor/action-zip@v1.2
       with:
-        files: target/x86_64-unknown-linux-gnu/release/kopia-fsrepo-recovery LICENSE.txt README.md
+        files: target/x86_64-unknown-linux-gnu/release/kopia-fsrepo-recovery LICENCE.txt README.md
         dest: kopia-fsrepo-recovery-x86_64-linux.zip
     - name: Release
       uses: softprops/action-gh-release@v1
