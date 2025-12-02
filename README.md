@@ -75,3 +75,5 @@ Re-run kopia snapshot verify and capture its logs. Hopefully this time there are
 ```shell
 kopia snapshot verify --verify-files-percent=100 --file-parallelism=10 --parallel=10 --max-errors=999999999 2>&1 | tee kopia-snapshot-verify-log-post-restore.txt
 ```
+
+The re-verify may find more missing blobs and you may have to repeat this cycle several times.
