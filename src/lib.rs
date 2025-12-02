@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+pub mod check;
 pub mod extract_from_log;
 pub mod restore;
 

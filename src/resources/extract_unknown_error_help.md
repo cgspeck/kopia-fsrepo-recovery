@@ -8,7 +8,7 @@ The log has the following unknown errors:
 ```
 ----
 
-You need to investigate the unknown errors listed above or use the --continue-on-unknown-error argument.
+You need to investigate the unknown errors listed above or use the --continue-on-unknown-errors argument.
 
 The following commands may help to identify what blobs belong to what object files:
 

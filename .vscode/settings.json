@@ -1,0 +1,10 @@
+{
+    "rust-analyzer.files.exclude": [
+        "source",
+        "dest"
+    ],
+    "files.watcherExclude": {
+        "dest": true,
+        "source": true
+    }
+}

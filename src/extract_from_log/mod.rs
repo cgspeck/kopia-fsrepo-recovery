@@ -46,7 +46,7 @@ fn to_expected_path(blob_id: &str) -> String {
     return format!("{}/{}/{}.f", &blob_id[0..3], &blob_id[3..6], &blob_id[6..]);
 }
 
-pub fn extract_from_log(
+pub fn run_extract_from_log(
     input_logfile: &PathBuf,
     out_file_path: &PathBuf,
     continue_on_unknown_errors: &bool,
@@ -57,8 +57,14 @@ pub fn extract_from_log(
     );
     let re_error_count = Regex::new(r"^encountered (?P<error_count>\d+)").unwrap(); // Named groups
     // ^error processing .* object (.*) is backed by missing blob (.*)$
-    let re_objects_and_blobs = Regex::new(
+    let re_missing_blobs = Regex::new(
         r"^error processing .* object (?P<object_id>.*) is backed by missing blob (?P<blob_id>.*)$",
+    )
+    .unwrap();
+
+    // ^error processing .* error reading object ([A-Za-z0-9]*).*invalid checksum at ([a-z0-9\-]*) offset .*$
+    let re_error_reading_blob = Regex::new(
+        r"^error processing .* error reading object (?P<object_id>[A-Za-z0-9]*).*invalid checksum at (?P<blob_id>[a-z0-9\-]*) offset .*$"
     )
     .unwrap();
 
@@ -72,7 +78,22 @@ pub fn extract_from_log(
         let line = line_result?; // Handle potential errors during line reading
 
         if line.starts_with("error processing") {
-            if let Some(captures) = re_objects_and_blobs.captures(&line) {
+            if let Some(captures) = re_missing_blobs.captures(&line) {
+                let object_id = captures
+                    .name("object_id")
+                    .map(|m| m.as_str())
+                    .context("Unable to parse object_id")?;
+                let blob_id = captures
+                    .name("blob_id")
+                    .map(|m| m.as_str())
+                    .context("Unable to parse blob_id")?;
+
+                object_and_blob_ids.push(ObjectAndBlobId {
+                    object_id: object_id.into(),
+                    blob_id: blob_id.into(),
+                    expected_path: to_expected_path(blob_id),
+                });
+            } else if let Some(captures) = re_error_reading_blob.captures(&line) {
                 let object_id = captures
                     .name("object_id")
                     .map(|m| m.as_str())

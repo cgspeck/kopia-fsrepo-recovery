@@ -1,13 +1,15 @@
 [package]
 name = "kopia-fsrepo-recovery"
-version = "0.1.0"
+version = "0.22.1"
 edition = "2024"
 description = "Copy files from a kopia file system backup repository back to primary repository"
+license = "GPL-3.0-or-later"
 
 [dependencies]
 anyhow = "1.0.100"
 clap = { version = "4.5.53", features = ["derive"] }
 env_logger = "0.11.8"
+indicatif = "0.18.3"
 log = "0.4.28"
 regex = "1.12.2"
 serde = "1.0.228"
