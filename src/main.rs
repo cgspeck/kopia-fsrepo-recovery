@@ -6,10 +6,10 @@ use kopia_fsrepo_recovery::{
     check::run_check, extract_from_log::run_extract_from_log, restore::run_restore,
 };
 
-const LONG_ABOUT: &str = include_str!("resources/long_about.md");
+const SHORT_ABOUT: &str = include_str!("resources/short_about.md");
 
 #[derive(Parser)]
-#[command(version, about, long_about = LONG_ABOUT, arg_required_else_help = true)]
+#[command(version, about = SHORT_ABOUT, arg_required_else_help = true)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -17,7 +17,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    // Verifies that missing blobs are present in source repo
+    /// Verifies that missing blobs are present in source repo
     Check {
         source_repo: PathBuf,
         #[arg(short, long, default_value = "./missing-blobs.json")]
@@ -31,7 +31,7 @@ enum Commands {
         #[arg(short, long, default_value_t = false)]
         continue_on_unknown_errors: bool,
     },
-    // Copies identified blobs from source repo to destination repo
+    /// Copies identified blobs from source repo to destination repo
     Restore {
         source_repo: PathBuf,
         dest_repo: PathBuf,
