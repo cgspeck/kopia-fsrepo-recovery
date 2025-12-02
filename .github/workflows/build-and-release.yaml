@@ -1,0 +1,32 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Build Release
+      run: make release
+    - name: Archive
+      uses: vimtor/action-zip@v1.2
+      with:
+        files: target/x86_64-unknown-linux-gnu/release/kopia-fsrepo-recovery LICENSE.txt README.md
+        dest: kopia-fsrepo-recovery-x86_64-linux.zip
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        fail_on_unmatched_files: true
+        files: |
+          kopia-fsrepo-recovery-x86_64-linux.zip
